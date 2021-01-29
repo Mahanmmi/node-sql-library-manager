@@ -1,0 +1,18 @@
+# docker-compose.yml
+version: "3"
+services:
+  app:
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+
+  postgres:
+    image: postgres:13.1-alpine
+    environment:
+      POSTGRES_USER: DBProject
+      POSTGRES_PASSWORD: DBProject
+      POSTGRES_DB: DBProject
+
