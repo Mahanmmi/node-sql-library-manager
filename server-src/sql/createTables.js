@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Users (
   first_name text NOT NULL,
   last_name text NOT NULL,
   user_type user_mods NOT NULL,
-  user_balance INTEGER DEFAULT 0,
+  user_balance INTEGER DEFAULT 0 CHECK (user_balance >= 0),
   created_on TIMESTAMPTZ DEFAULT now()
 );
 `.trim();

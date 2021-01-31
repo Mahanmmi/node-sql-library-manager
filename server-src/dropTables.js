@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { dropDB } = require('./database');
 
 dropDB().then(() => {
