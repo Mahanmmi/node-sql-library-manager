@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./server-src/index.js",
-    "dev": "env-cmd -f .env.dev nodemon ./server-src/index.js"
+    "dev": "env-cmd -f .env.dev nodemon ./server-src/index.js",
+    "drop": "env-cmd -f .env.dev node ./server-src/dropTables.js"
   },
   "author": "Mahan ZDH",
   "license": "ISC",

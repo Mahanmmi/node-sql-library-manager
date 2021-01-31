@@ -1,27 +1,55 @@
 /* eslint-disable no-await-in-loop */
-const { Client } = require('pg');
+const { Pool } = require('pg');
 
-let client;
+const importExtensions = require('./sql/extensions');
+const createTables = require('./sql/createTables');
+const attachTriggers = require('./sql/triggers');
 
-async function tryConnect() {
-  let isConnected = false;
-  while (!isConnected) {
+let mainPool;
+
+async function getPool() {
+  while (!mainPool) {
     try {
-      client = new Client({
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
+      mainPool = new Pool({
+        user: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        database: process.env.POSTGRES_DB,
         host: process.env.PGHOST,
         port: process.env.PGPORT,
       });
-      await client.connect();
-      isConnected = true;
-      module.exports = client;
+      const client = await mainPool.connect();
+      client.release();
     } catch (e) {
-      await client.end();
-      // console.error(e.message);
+      await mainPool.end();
+      mainPool = undefined;
+      console.error(e.message);
     }
+  }
+  return mainPool;
+}
+
+async function initDB() {
+  const pool = await getPool();
+  const client = await pool.connect();
+  await client.query('BEGIN');
+  try {
+    await importExtensions(client);
+    await createTables(client);
+    await attachTriggers(client);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.log(`Database initilization failed: ${err.message}`);
+  } finally {
+    client.release();
   }
 }
 
-tryConnect();
+async function dropDB() {
+  const pool = await getPool();
+  await pool.query('DROP SCHEMA public cascade');
+  await pool.query('CREATE SCHEMA public');
+  await pool.end();
+}
+
+module.exports = { initDB, dropDB, getPool };

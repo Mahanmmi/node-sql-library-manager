@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
-require('./database');
-
-console.log('successfully connected to database');
-
+const { initDB } = require('./database');
 const app = require('./app');
 
-app.listen(3000, () => {
-  console.log('Server is running');
+initDB().then(() => {
+  app.listen(3000, async () => {
+    console.log('Server is running...');
+  });
+}).catch((err) => {
+  console.log(`Database initilization timed out: ${err.message}`);
 });
