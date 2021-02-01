@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const importExtensions = require('./sql/extensions');
 const createTables = require('./sql/createTables');
 const attachTriggers = require('./sql/triggers');
+const { registerBookFunctionsAndViews } = require('./sql/bookQueries');
 
 let mainPool;
 
@@ -36,6 +37,7 @@ async function initDB() {
     await importExtensions(client);
     await createTables(client);
     await attachTriggers(client);
+    await registerBookFunctionsAndViews(client);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');

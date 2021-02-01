@@ -2,14 +2,16 @@ const createPublishers = `
 CREATE TABLE IF NOT EXISTS Publishers (
   publisher_name text NOT NULL PRIMARY KEY,
   publisher_address text NOT NULL,
-  publisher_website VARCHAR (512) NOT NULL
+  publisher_website text NOT NULL
 );
 `.trim();
 
 const createBooks = `
+CREATE TYPE book_types AS ENUM ('normal', 'coursebook', 'reference');
 CREATE TABLE IF NOT EXISTS Books (
   book_id text,
   book_volume text,
+  book_type book_types NOT NULL,
   book_title text NOT NULL,
   book_genre text NOT NULL,
   book_page_count SMALLINT NOT NULL,
@@ -148,7 +150,17 @@ const createMessages = `
 CREATE TABLE IF NOT EXISTS Messages (
   message_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   message_text text
-)
+);
+`.trim();
+
+const createActions = `
+CREATE TABLE IF NOT EXISTS Actions (
+  action_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  username citext NOT NULL,
+  action_text text NOT NULL,
+  action_time TIMESTAMPTZ DEFAULT now(),
+  FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
+);
 `.trim();
 
 async function createTables(client) {
@@ -168,6 +180,7 @@ async function createTables(client) {
   await client.query(createBorrows);
   await client.query(createBorrowBooks);
   await client.query(createMessages);
+  await client.query(createActions);
 }
 
 module.exports = createTables;

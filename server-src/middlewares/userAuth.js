@@ -4,6 +4,8 @@ const {
   getProfessorUserByAuth,
   getLibrarianUserByAuth,
   getManagerUserByAuth,
+  getUserPhoneNumbers,
+  getUserAddresses,
 } = require('../sql/userQueries');
 const { getPool } = require('../database');
 
@@ -11,6 +13,8 @@ async function tryFind(pool, query, token, req) {
   const user = (await pool.query(query, [token])).rows[0];
   if (user) {
     req.user = user;
+    req.user.phoneNumbers = (await pool.query(getUserPhoneNumbers, [user.username])).rows;
+    req.user.addresses = (await pool.query(getUserAddresses, [user.username])).rows;
     return true;
   }
   return false;
@@ -31,7 +35,7 @@ async function userAuth(req, res, next) {
     if (await tryFind(pool, getManagerUserByAuth, token, req)) return next();
     return res.sendStatus(401);
   } catch (err) {
-    res.status(500).send(`User auth check failed: ${err.message}`);
+    return res.status(500).send(`User auth check failed: ${err.message}`);
   }
 }
 

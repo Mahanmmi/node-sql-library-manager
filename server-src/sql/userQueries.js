@@ -74,6 +74,11 @@ WHERE EXISTS (
 ) RETURNING *;
 `.trim();
 
+const logoutUser = `
+DELETE FROM UserTokens
+WHERE username = $1 AND token = $2;
+`.trim();
+
 const getNormalUserByAuth = `
 SELECT *
 FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN NormalUsers
@@ -81,23 +86,35 @@ WHERE token = $1;
 `.trim();
 const getStudentUserByAuth = `
 SELECT *
-FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN StudentUsers
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN StudentUsers
 WHERE token = $1;
 `.trim();
 const getProfessorUserByAuth = `
 SELECT *
-FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN ProfessorUsers
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN ProfessorUsers
 WHERE token = $1;
 `.trim();
 const getLibrarianUserByAuth = `
 SELECT *
-FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN LibrarianUsers
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN LibrarianUsers
 WHERE token = $1;
 `.trim();
 const getManagerUserByAuth = `
 SELECT *
-FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN ManagerUsers
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN ManagerUsers
 WHERE token = $1;
+`.trim();
+
+const getUserPhoneNumbers = `
+SELECT phone_number
+FROM UserPhoneNumbers
+WHERE username = $1
+`.trim();
+
+const getUserAddresses = `
+SELECT address
+FROM UserAddresses
+WHERE username = $1
 `.trim();
 
 module.exports = {
@@ -110,9 +127,12 @@ module.exports = {
   insertLibrarianUser,
   insertManagerUser,
   loginUser,
+  logoutUser,
   getNormalUserByAuth,
   getStudentUserByAuth,
   getProfessorUserByAuth,
   getLibrarianUserByAuth,
   getManagerUserByAuth,
+  getUserPhoneNumbers,
+  getUserAddresses,
 };

@@ -83,6 +83,16 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/logout', userAuth, async (req, res) => {
+  const pool = await getPool();
+  try {
+    await pool.query(userQueries.logoutUser, [req.user.username, req.user.token]);
+    return res.sendStatus(200);
+  } catch (err) {
+    return res.status(500).send(`Logout failed: ${err.message}`);
+  }
+});
+
 router.get('/me', userAuth, async (req, res) => {
   res.send(req.user);
 });
