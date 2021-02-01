@@ -142,35 +142,41 @@ END;
 $add_book_function$ LANGUAGE plpgsql;
 `.trim();
 
-const registerBookCountView = `
-`.trim();
-
 const createBook = `
 SELECT create_book_function(
   $1, $2, $3, $4, $5,
   $6, $7, $8, $9, $10
-)
+);
 `.trim();
 
 const createPublisher = `
 SELECT create_publisher_function(
   $1, $2, $3, $4, $5
-)
+);
 `.trim();
 
 const addWriter = `
 SELECT add_book_writer_function(
   $1, $2, $3, $4, $5
-)
+);
 `.trim();
 
 const addBook = `
 SELECT add_book_function(
   $1, $2, $3, $4
-)
+);
 `.trim();
 
-
+const searchBook = `
+SELECT *
+FROM Books NATURAL JOIN BookWriters
+WHERE (
+  book_title LIKE $1 AND
+  writer_name LIKE $2 AND
+  book_volume LIKE $3 AND
+  book_genre LIKE $4
+);
+`.trim();
 
 async function registerBookFunctionsAndViews(client) {
   await client.query(registerCreateBookFunction);
@@ -185,4 +191,5 @@ module.exports = {
   createPublisher,
   addWriter,
   addBook,
+  searchBook,
 };

@@ -56,6 +56,21 @@ router.post('/add', userAuth, async (req, res) => {
   }
 });
 
+router.get('/search', async (req, res) => {
+  const pool = await getPool();
+  try {
+    const result = await pool.query(bookQueries.searchBook, [
+      req.query.title ? `%${req.query.title}%` : '%',
+      req.query.name ? `%${req.query.name}%` : '%',
+      req.query.volume ? `%${req.query.volume}%` : '%',
+      req.query.genre ? `%${req.query.genre}%` : '%',
+    ]);
+    return res.send(result);
+  } catch (err) {
+    return res.status(400).send(`Book creation failed: ${err.message}`);
+  }
+});
+
 router.post('/publisher', userAuth, async (req, res) => {
   const pool = await getPool();
   try {
