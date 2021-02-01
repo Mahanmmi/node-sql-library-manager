@@ -2,8 +2,7 @@ const createPublishers = `
 CREATE TABLE IF NOT EXISTS Publishers (
   publisher_name text NOT NULL PRIMARY KEY,
   publisher_address text NOT NULL,
-  publisher_website VARCHAR (512) NOT NULL,
-  created_on TIMESTAMPTZ DEFAULT now()
+  publisher_website VARCHAR (512) NOT NULL
 );
 `.trim();
 
@@ -16,7 +15,6 @@ CREATE TABLE IF NOT EXISTS Books (
   book_page_count SMALLINT NOT NULL,
   book_price INTEGER NOT NULL,
   publisher_name text NOT NULL,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (book_id, book_volume),
   FOREIGN KEY (publisher_name) REFERENCES Publishers(publisher_name) ON DELETE CASCADE
 );
@@ -27,7 +25,6 @@ CREATE TABLE IF NOT EXISTS BookWriters (
   book_id text,
   book_volume text,
   writer_name text,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (book_id, book_volume, writer_name),
   FOREIGN KEY (book_id, book_volume) REFERENCES Books(book_id, book_volume) ON DELETE CASCADE
 );
@@ -39,7 +36,6 @@ CREATE TABLE IF NOT EXISTS StorageBook (
   book_volume text,
   in_edition_id UUID DEFAULT uuid_generate_v4(),
   is_available SMALLINT DEFAULT 1,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (book_id, book_volume, in_edition_id),
   FOREIGN KEY (book_id, book_volume) REFERENCES Books(book_id, book_volume) ON DELETE CASCADE
 );
@@ -62,7 +58,6 @@ const createUserTokens = `
 CREATE TABLE IF NOT EXISTS UserTokens (
   username citext,
   token text UNIQUE,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (username, token),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
@@ -72,7 +67,6 @@ const createUserPhoneNumbers = `
 CREATE TABLE IF NOT EXISTS UserPhoneNumbers (
   username citext,
   phone_number text,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (username, phone_number),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
@@ -82,7 +76,6 @@ const createUserAddresses = `
 CREATE TABLE IF NOT EXISTS UserAddresses (
   username citext,
   address text,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (username, address),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
@@ -131,10 +124,9 @@ CREATE TABLE IF NOT EXISTS ManagerUsers (
 const createBorrows = `
 CREATE TABLE IF NOT EXISTS Borrows (
   borrow_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  borrow_start_date TIMESTAMPTZ NOT NULL,
+  borrow_start_date TIMESTAMPTZ DEFAULT now(),
   borrow_end_date TIMESTAMPTZ NOT NULL,
   username citext,
-  created_on TIMESTAMPTZ DEFAULT now(),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
 `.trim();
@@ -146,7 +138,6 @@ CREATE TABLE IF NOT EXISTS BorrowBooks (
   book_volume text,
   in_edition_id UUID,
   received_date TIMESTAMPTZ NOT NULL,
-  created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (borrow_id, book_id, book_volume, in_edition_id),
   FOREIGN KEY (borrow_id) REFERENCES Borrows(borrow_id) ON DELETE CASCADE,
   FOREIGN KEY (book_id, book_volume, in_edition_id) REFERENCES StorageBook(book_id, book_volume, in_edition_id) ON DELETE CASCADE
@@ -156,8 +147,7 @@ CREATE TABLE IF NOT EXISTS BorrowBooks (
 const createMessages = `
 CREATE TABLE IF NOT EXISTS Messages (
   message_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  message_text text,
-  created_on TIMESTAMPTZ DEFAULT now()
+  message_text text
 )
 `.trim();
 

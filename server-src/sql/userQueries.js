@@ -74,6 +74,32 @@ WHERE EXISTS (
 ) RETURNING *;
 `.trim();
 
+const getNormalUserByAuth = `
+SELECT *
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN NormalUsers
+WHERE token = $1;
+`.trim();
+const getStudentUserByAuth = `
+SELECT *
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN StudentUsers
+WHERE token = $1;
+`.trim();
+const getProfessorUserByAuth = `
+SELECT *
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN ProfessorUsers
+WHERE token = $1;
+`.trim();
+const getLibrarianUserByAuth = `
+SELECT *
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN LibrarianUsers
+WHERE token = $1;
+`.trim();
+const getManagerUserByAuth = `
+SELECT *
+FROM Users NATURAL JOIN UserTokens NATURAL JOIN UserPhoneNumbers NATURAL JOIN UserAddresses NATURAL JOIN ManagerUsers
+WHERE token = $1;
+`.trim();
+
 module.exports = {
   insertUser,
   insertPhoneNumber,
@@ -83,6 +109,10 @@ module.exports = {
   insertProfessorUser,
   insertLibrarianUser,
   insertManagerUser,
-  getUserByUsername,
   loginUser,
+  getNormalUserByAuth,
+  getStudentUserByAuth,
+  getProfessorUserByAuth,
+  getLibrarianUserByAuth,
+  getManagerUserByAuth,
 };

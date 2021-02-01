@@ -7,6 +7,8 @@ const router = new express.Router();
 const userQueries = require('../sql/userQueries');
 const { getPool } = require('../database');
 
+const userAuth = require('../middlewares/userAuth');
+
 router.post('/', async (req, res) => {
   const pool = await getPool();
   const client = await pool.connect();
@@ -75,10 +77,14 @@ router.post('/login', async (req, res) => {
     if (!loginRow) {
       return res.sendStatus(401);
     }
-    res.send(loginRow.token);
+    return res.send(loginRow.token);
   } catch (err) {
-    res.status(500).send(`Login failed: ${err.message}`);
+    return res.status(500).send(`Login failed: ${err.message}`);
   }
+});
+
+router.get('/me', userAuth, async (req, res) => {
+  res.send(req.user);
 });
 
 module.exports = router;
