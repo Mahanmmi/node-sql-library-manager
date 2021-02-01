@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS Users (
   first_name text NOT NULL,
   last_name text NOT NULL,
   user_type user_mods NOT NULL,
-  user_balance INTEGER DEFAULT 0 CHECK (user_balance >= 0),
+  user_balance REAL DEFAULT 0 CHECK (user_balance >= 0),
   created_on TIMESTAMPTZ DEFAULT now()
 );
 `.trim();
@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS Borrows (
   borrow_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   borrow_start_date TIMESTAMPTZ DEFAULT now(),
   borrow_end_date TIMESTAMPTZ NOT NULL,
+  received_date TIMESTAMPTZ,
   username citext,
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
@@ -139,7 +140,6 @@ CREATE TABLE IF NOT EXISTS BorrowBooks (
   book_id text,
   book_volume text,
   in_edition_id UUID,
-  received_date TIMESTAMPTZ NOT NULL,
   PRIMARY KEY (borrow_id, book_id, book_volume, in_edition_id),
   FOREIGN KEY (borrow_id) REFERENCES Borrows(borrow_id) ON DELETE CASCADE,
   FOREIGN KEY (book_id, book_volume, in_edition_id) REFERENCES StorageBook(book_id, book_volume, in_edition_id) ON DELETE CASCADE

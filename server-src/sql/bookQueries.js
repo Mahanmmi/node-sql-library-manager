@@ -175,10 +175,10 @@ WHERE (
   writer_name LIKE $2 AND
   book_volume LIKE $3 AND
   book_genre LIKE $4
-);
+) ORDER BY book_title;
 `.trim();
 
-async function registerBookFunctionsAndViews(client) {
+async function registerBookFunctions(client) {
   await client.query(registerCreateBookFunction);
   await client.query(registerCreatePublisherFunction);
   await client.query(registerAddBookWriterFunction);
@@ -186,7 +186,7 @@ async function registerBookFunctionsAndViews(client) {
 }
 
 module.exports = {
-  registerBookFunctionsAndViews,
+  registerBookFunctions,
   createBook,
   createPublisher,
   addWriter,
