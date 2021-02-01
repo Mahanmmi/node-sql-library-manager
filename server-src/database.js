@@ -14,8 +14,8 @@ async function getPool() {
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
         database: process.env.POSTGRES_DB,
-        host: process.env.PGHOST,
-        port: process.env.PGPORT,
+        host: process.env.POSTGRES_HOST,
+        port: process.env.POSTGRES_PORT,
       });
       const client = await mainPool.connect();
       client.release();

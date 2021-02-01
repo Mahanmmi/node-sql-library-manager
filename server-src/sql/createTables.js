@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS Users (
 const createUserTokens = `
 CREATE TABLE IF NOT EXISTS UserTokens (
   username citext,
-  token text,
+  token text UNIQUE,
   created_on TIMESTAMPTZ DEFAULT now(),
   PRIMARY KEY (username, token),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE

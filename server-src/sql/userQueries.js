@@ -58,6 +58,22 @@ INSERT INTO ManagerUsers(username) VALUES(
 ) RETURNING *;
 `.trim();
 
+const getUserByUsername = `
+SELECT *
+FROM Users
+WHERE username = $1;
+`.trim();
+
+const loginUser = `
+INSERT INTO UserTokens(username, token)
+SELECT $1::text, crypt($1::text, gen_salt('bf'))::text
+WHERE EXISTS (
+  SELECT *
+  FROM Users
+  WHERE username = $1 AND password = crypt($2, password)
+) RETURNING *;
+`.trim();
+
 module.exports = {
   insertUser,
   insertPhoneNumber,
@@ -67,4 +83,6 @@ module.exports = {
   insertProfessorUser,
   insertLibrarianUser,
   insertManagerUser,
+  getUserByUsername,
+  loginUser,
 };

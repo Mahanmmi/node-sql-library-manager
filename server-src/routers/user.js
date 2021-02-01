@@ -58,12 +58,26 @@ router.post('/', async (req, res) => {
 
     await client.query('COMMIT');
 
-    res.status(201).send(user);
+    res.status(201).send(user.rows[0]);
   } catch (err) {
     await client.query('ROLLBACK');
     res.status(400).send(`User creation failed: ${err.message}`);
   } finally {
     client.release();
+  }
+});
+
+router.post('/login', async (req, res) => {
+  const pool = await getPool();
+  try {
+    const loginRow = (await pool.query(userQueries.loginUser,
+      [req.body.username, req.body.password])).rows[0];
+    if (!loginRow) {
+      return res.sendStatus(401);
+    }
+    res.send(loginRow.token);
+  } catch (err) {
+    res.status(500).send(`Login failed: ${err.message}`);
   }
 });
 
