@@ -1,3 +1,28 @@
+const registerAddBalanceFunction = `
+CREATE OR REPLACE FUNCTION add_balance_function(
+  in_balance REAL,
+  in_username text
+) RETURNS VOID AS $add_balance_function$
+BEGIN
+  IF in_balance <= 0 THEN
+    RAISE EXCEPTION 'Added balance must be positive';
+  END IF;
+
+  UPDATE Users
+  SET user_balance = user_balance + in_balance
+  WHERE username = in_username;
+
+  INSERT INTO ACTIONS(
+    username,
+    action_text
+  ) VALUES (
+    in_username,
+    FORMAT('Added %s to their balance', in_balance)
+  );
+END;
+$add_balance_function$ LANGUAGE plpgsql;
+`.trim();
+
 const insertUser = `
 INSERT INTO Users(username, password, first_name, last_name, user_type, user_balance) VALUES(
   $1,
@@ -117,7 +142,18 @@ FROM UserAddresses
 WHERE username = $1
 `.trim();
 
+const addBalance = `
+SELECT add_balance_function(
+  $1, $2
+)
+`
+
+async function registerUserFunctions(client) {
+  await client.query(registerAddBalanceFunction);
+}
+
 module.exports = {
+  registerUserFunctions,
   insertUser,
   insertPhoneNumber,
   insertAddress,
@@ -135,4 +171,5 @@ module.exports = {
   getManagerUserByAuth,
   getUserPhoneNumbers,
   getUserAddresses,
+  addBalance,
 };

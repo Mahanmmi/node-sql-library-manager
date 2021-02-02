@@ -174,7 +174,7 @@ BEGIN
       action_text
     ) VALUES (
       in_username,
-      FORMAT('User %s returned borrow %s', in_username, in_borrow_id)
+      FORMAT('Returned borrow %s', in_borrow_id)
     );
   END IF;
 END;

@@ -6,6 +6,7 @@ const createTables = require('./sql/createTables');
 const attachTriggers = require('./sql/triggers');
 const { registerBookFunctions } = require('./sql/bookQueries');
 const { registerBorrowFunctions } = require('./sql/borrowQueries');
+const { registerUserFunctions } = require('./sql/userQueries');
 
 let mainPool;
 
@@ -38,6 +39,7 @@ async function initDB() {
     await importExtensions(client);
     await createTables(client);
     await attachTriggers(client);
+    await registerUserFunctions(client);
     await registerBookFunctions(client);
     await registerBorrowFunctions(client);
     await client.query('COMMIT');

@@ -97,4 +97,17 @@ router.get('/me', userAuth, async (req, res) => {
   res.send(req.user);
 });
 
+router.post('/balance', userAuth, async (req, res) => {
+  const pool = await getPool();
+  try {
+    await pool.query(userQueries.addBalance, [
+      req.body.balance,
+      req.user.username,
+    ]);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400).send(`‌Add balance failed: ${err.message}`);
+  }
+});
+
 module.exports = router;
