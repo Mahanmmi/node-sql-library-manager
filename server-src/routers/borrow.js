@@ -39,4 +39,17 @@ router.post('/', userAuth, async (req, res) => {
   }
 });
 
+router.post('/end', userAuth, async (req, res) => {
+  const pool = await getPool();
+  try {
+    await pool.query(borrowQueries.endBorrow, [
+      req.body.borrowId,
+      req.user.username,
+    ]);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400).send(`‌Return borrow failed: ${err.message}`);
+  }
+});
+
 module.exports = router;

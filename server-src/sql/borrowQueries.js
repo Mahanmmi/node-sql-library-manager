@@ -8,30 +8,36 @@ DECLARE
   id UUID;
   late_count INT;
   banned_until TIMESTAMPTZ;
+  tmp RECORD;
 BEGIN
-    SELECT late_count = COUNT(*)
-    FROM Borrows
-    WHERE (
-      borrow_start_date + INTERVAL '60 days' > now() AND
-      received_date IS NOT NULL AND
-      borrow_end_date < received_date
+    
+    late_count := (
+      SELECT COUNT(*)
+      FROM Borrows
+      WHERE (
+        borrow_start_date + INTERVAL '60 days' > now() AND
+        received_date IS NOT NULL AND
+        borrow_end_date < received_date
+      )
+    );
+    
+    banned_until := (
+      SELECT (received_date + INTERVAL '30 days')
+      FROM Borrows
+      WHERE (
+        borrow_start_date + INTERVAL '30 days' > now() AND
+        received_date IS NOT NULL AND
+        borrow_end_date < received_date)
+      ORDER BY received_date DESC
+      LIMIT 1
     );
 
-    SELECT banned_until = received_date + INTERVAL '30 days'
-    FROM Borrows
-    WHERE (
-      borrow_start_date + INTERVAL '30 days' > now() AND
-      received_date IS NOT NULL AND
-      borrow_end_date < received_date)
-    ORDER BY received_date DESC
-    LIMIT 1;
-
-    IF late_count >= 4 AND banned_until < now() THEN
+    IF late_count >= 4 AND banned_until > now() THEN
       RAISE EXCEPTION 'You cannot borrow any more your account is limited until %', banned_until;
     END IF;
 
     INSERT INTO Borrows(
-      in_borrow_end_date,
+      borrow_end_date,
       username
     ) VALUES (
       in_borrow_end_date,
@@ -44,19 +50,20 @@ BEGIN
       username,
       FORMAT('Created new borrow')
     );
+
     RETURN id;
 END;
 $create_borrow_function$ LANGUAGE plpgsql;
 `.trim();
 
-const addBorrowBookFunction = `
-CREATE OR REPLACE FUNCTION add_borrow_Book_function(
+const registerAddBorrowBookFunction = `
+CREATE OR REPLACE FUNCTION add_borrow_book_function(
   borrow_id UUID,
   bookid text,
   bookvolume text,
   user_type user_mods,
   in_username text
-) RETURNS VOID AS $add_borrow_Book_function$
+) RETURNS VOID AS $add_borrow_book_function$
 DECLARE
   userperm SMALLINT;
   book_rec RECORD;
@@ -119,9 +126,59 @@ BEGIN
         );
       END IF;
     END IF;
-
 END;
-$add_borrow_Book_function$ LANGUAGE plpgsql;
+$add_borrow_book_function$ LANGUAGE plpgsql;
+`.trim();
+
+const registerEndBorrowFunction = `
+CREATE OR REPLACE FUNCTION end_borrow_function(
+  in_borrow_id UUID,
+  in_username text
+) RETURNS VOID AS $end_borrow_function$
+DECLARE
+brec RECORD;
+BEGIN
+
+  UPDATE Borrows
+  SET received_date = now()
+  WHERE borrow_id = in_borrow_id;
+
+  SELECT received_date, borrow_end_date
+  INTO brec
+  FROM Borrows
+  WHERE borrow_id = in_borrow_id;
+
+  IF brec IS NULL THEN
+    RAISE EXCEPTION 'Borrow not found';
+  END IF;
+
+  UPDATE StorageBook
+  SET is_available = 1
+  WHERE (book_id, book_volume, in_edition_id) in (
+    SELECT book_id, book_volume, in_edition_id
+    FROM StorageBook NATURAL JOIN BorrowBooks
+    WHERE borrow_id = in_borrow_id
+  );
+
+  IF brec.received_date > brec.borrow_end_date THEN
+    INSERT INTO ACTIONS(
+      username,
+      action_text
+    ) VALUES (
+      in_username,
+      FORMAT('User %s returned borrow %s LATE', in_username, in_borrow_id)
+    );
+  ELSE
+    INSERT INTO ACTIONS(
+      username,
+      action_text
+    ) VALUES (
+      in_username,
+      FORMAT('User %s returned borrow %s', in_username, in_borrow_id)
+    );
+  END IF;
+END;
+$end_borrow_function$ LANGUAGE plpgsql;
 `.trim();
 
 const createBorrow = `
@@ -136,13 +193,21 @@ SELECT add_borrow_Book_function(
 );
 `.trim();
 
+const endBorrow = `
+SELECT end_borrow_function (
+  $1, $2
+);
+`.trim();
+
 async function registerBorrowFunctions(client) {
   await client.query(registerCreateBorrowFunction);
-  await client.query(addBorrowBookFunction);
+  await client.query(registerAddBorrowBookFunction);
+  await client.query(registerEndBorrowFunction);
 }
 
 module.exports = {
   registerBorrowFunctions,
   createBorrow,
   addBorrowBook,
+  endBorrow,
 }
