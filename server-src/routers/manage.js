@@ -62,4 +62,18 @@ router.get('/late', userAuth, async (req, res) => {
   }
 });
 
+router.post('/history', userAuth, async (req, res) => {
+  const pool = await getPool();
+  try {
+    const result = await pool.query(adminQueries.getBorrowHistory, [
+      req.body.bookId,
+      req.body.bookVol,
+      req.user.user_type,
+    ]);
+    return res.send(result);
+  } catch (err) {
+    return res.status(400).send(`Get overdue books failed: ${err.message}`);
+  }
+});
+
 module.exports = router;
