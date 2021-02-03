@@ -73,6 +73,35 @@ END;
 $user_search_function$ LANGUAGE plpgsql;
 `.trim();
 
+const registerGetOverdueBooksFunction = `
+CREATE OR REPLACE FUNCTION get_overdue_books_function(
+  in_user_type user_mods
+) RETURNS TABLE (
+    bookid text,
+    bookvolume text,
+    in_ed_id UUID,
+    borrow_deadline TIMESTAMPTZ
+) AS $get_overdue_books_function$
+BEGIN
+IF in_user_type != 'manager' AND in_user_type != 'librarian' THEN
+    RAISE EXCEPTION 'You dont have permission to search users';
+END IF;
+RETURN QUERY (
+    SELECT 
+      book_id AS bookid,
+      book_volume AS bookvolume,
+      in_edition_id AS in_ed_id,
+      borrow_end_date AS borrow_deadline
+    FROM Borrows NATURAL JOIN BorrowBooks
+    WHERE
+      now() > borrow_end_date AND
+      received_date IS NULL
+    ORDER BY (now() - borrow_end_date) DESC
+  );
+END;
+$get_overdue_books_function$ LANGUAGE plpgsql;
+`.trim();
+
 const getBorrowedBookReport = `
 SELECT get_borrowed_book_function(
   $1, $2
@@ -91,10 +120,17 @@ SELECT user_search_function(
 );
 `.trim();
 
+const getOverdueBooks = `
+SELECT get_overdue_books_function(
+  $1
+);
+`.trim();
+
 async function registerAdminFunctions(client) {
   await client.query(registerGetBorrowedBooksFunction);
   await client.query(registerDeleteUserFunction);
   await client.query(registerUserSearchFunction);
+  await client.query(registerGetOverdueBooksFunction);
 }
 
 module.exports = {
@@ -102,4 +138,5 @@ module.exports = {
   getBorrowedBookReport,
   deleteUser,
   searchUsers,
+  getOverdueBooks,
 };
