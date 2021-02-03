@@ -85,12 +85,6 @@ INSERT INTO ManagerUsers(username) VALUES(
 ) RETURNING *;
 `.trim();
 
-const getUserByUsername = `
-SELECT *
-FROM Users
-WHERE username = $1;
-`.trim();
-
 const loginUser = `
 INSERT INTO UserTokens(username, token)
 SELECT $1::text, crypt($1::text, gen_salt('bf'))::text

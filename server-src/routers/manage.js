@@ -22,7 +22,7 @@ router.get('/borrowedbookreport', userAuth, async (req, res) => {
   }
 });
 
-router.delete('/user', userAuth, async (req, res) =>{
+router.delete('/user', userAuth, async (req, res) => {
   const pool = await getPool();
   try {
     await pool.query(adminQueries.deleteUser, [
