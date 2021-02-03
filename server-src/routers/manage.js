@@ -9,15 +9,29 @@ const { getPool } = require('../database');
 
 const userAuth = require('../middlewares/userAuth');
 
-router.get('/borrowedbookreport', async (req, res) => {
+router.get('/borrowedbookreport', userAuth, async (req, res) => {
   const pool = await getPool();
   try {
     const result = await pool.query(adminQueries.getBorrowedBookReport, [
       req.query.page ? req.query.page : 0,
+      req.user.user_type,
     ]);
     return res.send(result);
   } catch (err) {
     return res.status(400).send(`Get borrowed books report failed: ${err.message}`);
+  }
+});
+
+router.delete('/user', userAuth, async (req, res) =>{
+  const pool = await getPool();
+  try {
+    const result = await pool.query(adminQueries.deleteUser, [
+      req.body.username,
+      req.user.user_type,
+    ]);
+    return res.send(result);
+  } catch (err) {
+    return res.status(400).send(`Delete user failed: ${err.message}`);
   }
 });
 
