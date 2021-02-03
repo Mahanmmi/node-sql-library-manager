@@ -14,10 +14,12 @@ BEGIN
 
   INSERT INTO ACTIONS(
     username,
-    action_text
+    action_text,
+    action_type
   ) VALUES (
     in_username,
-    FORMAT('Added %s to their balance', in_balance)
+    FORMAT('Added %s to their balance', in_balance),
+    'addbalance'
   );
 END;
 $add_balance_function$ LANGUAGE plpgsql;
@@ -146,7 +148,7 @@ const addBalance = `
 SELECT add_balance_function(
   $1, $2
 )
-`
+`.trim();
 
 async function registerUserFunctions(client) {
   await client.query(registerAddBalanceFunction);

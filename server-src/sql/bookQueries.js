@@ -36,10 +36,12 @@ BEGIN
       );
       INSERT INTO ACTIONS(
         username,
-        action_text
+        action_text,
+        action_type
       ) VALUES (
         username,
-        FORMAT('Created book %s vol %s', book_id, book_volume)
+        FORMAT('Created book %s vol %s', book_id, book_volume),
+        'createbook'
       );
     END IF;
 END;
@@ -69,10 +71,12 @@ BEGIN
       );
       INSERT INTO ACTIONS(
         username,
-        action_text
+        action_text,
+        action_type
       ) VALUES (
         username,
-        FORMAT('Created publisher %s', publisher_name)
+        FORMAT('Created publisher %s', publisher_name),
+        'createpublisher'
       );
     END IF;
 END;
@@ -102,10 +106,12 @@ BEGIN
       );
       INSERT INTO ACTIONS(
         username,
-        action_text
+        action_text,
+        action_type
       ) VALUES (
         username,
-        FORMAT('Added writer %s to %s vol %s', writer_name, book_id, book_volume)
+        FORMAT('Added writer %s to %s vol %s', writer_name, book_id, book_volume),
+        'addbookwriter'
       );
     END IF;
 END;
@@ -132,10 +138,12 @@ BEGIN
       );
       INSERT INTO ACTIONS(
         username,
-        action_text
+        action_text,
+        action_type
       ) VALUES (
         username,
-        FORMAT('Added a %s vol %s book to storage', book_id, book_volume)
+        FORMAT('Added a %s vol %s book to storage', book_id, book_volume),
+        'addbook'
       );
     END IF;
 END;

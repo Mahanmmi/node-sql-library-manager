@@ -67,7 +67,7 @@ router.get('/search', async (req, res) => {
     ]);
     return res.send(result);
   } catch (err) {
-    return res.status(400).send(`Book creation failed: ${err.message}`);
+    return res.status(400).send(`Book search failed: ${err.message}`);
   }
 });
 

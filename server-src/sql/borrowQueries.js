@@ -43,12 +43,15 @@ BEGIN
       in_borrow_end_date,
       username
     ) RETURNING borrow_id into id;
+
     INSERT INTO ACTIONS(
       username,
-      action_text
+      action_text,
+      action_type
     ) VALUES (
       username,
-      FORMAT('Created new borrow')
+      FORMAT('Created new borrow'),
+      'startborrow'
     );
 
     RETURN id;
@@ -119,10 +122,12 @@ BEGIN
 
         INSERT INTO ACTIONS(
           username,
-          action_text
+          action_text,
+          action_type
         ) VALUES (
           in_username,
-          FORMAT('Added %s vol %s with edition id %s to borrow %s', bookid, bookvolume, book_rec.in_edition_id, borrow_id)
+          FORMAT('Added %s vol %s with edition id %s to borrow %s', bookid, bookvolume, book_rec.in_edition_id, borrow_id),
+          'addborrowbook'
         );
       END IF;
     END IF;
@@ -163,18 +168,22 @@ BEGIN
   IF brec.received_date > brec.borrow_end_date THEN
     INSERT INTO ACTIONS(
       username,
-      action_text
+      action_text,
+      action_type
     ) VALUES (
       in_username,
-      FORMAT('User %s returned borrow %s LATE', in_username, in_borrow_id)
+      FORMAT('Returned borrow %s LATE', in_borrow_id),
+      'endborrow'
     );
   ELSE
     INSERT INTO ACTIONS(
       username,
-      action_text
+      action_text,
+      action_type
     ) VALUES (
       in_username,
-      FORMAT('Returned borrow %s', in_borrow_id)
+      FORMAT('Returned borrow %s', in_borrow_id),
+      'endborrow'
     );
   END IF;
 END;

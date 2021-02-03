@@ -154,10 +154,16 @@ CREATE TABLE IF NOT EXISTS Messages (
 `.trim();
 
 const createActions = `
+CREATE TYPE action_types AS ENUM (
+  'startborrow', 'addborrowbook', 'endborrow',
+  'createbook', 'createpublisher', 'addbookwriter',
+  'addbook', 'addbalance'
+);
 CREATE TABLE IF NOT EXISTS Actions (
   action_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   username citext NOT NULL,
   action_text text NOT NULL,
+  action_type action_types NOT NULL,
   action_time TIMESTAMPTZ DEFAULT now(),
   FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );

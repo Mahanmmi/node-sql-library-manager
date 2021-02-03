@@ -7,6 +7,7 @@ const attachTriggers = require('./sql/triggers');
 const { registerBookFunctions } = require('./sql/bookQueries');
 const { registerBorrowFunctions } = require('./sql/borrowQueries');
 const { registerUserFunctions } = require('./sql/userQueries');
+const { registerAdminFunctions } = require('./sql/adminQueries');
 
 let mainPool;
 
@@ -42,6 +43,7 @@ async function initDB() {
     await registerUserFunctions(client);
     await registerBookFunctions(client);
     await registerBorrowFunctions(client);
+    await registerAdminFunctions(client);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
