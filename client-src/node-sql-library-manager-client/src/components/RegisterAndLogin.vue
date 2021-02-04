@@ -80,7 +80,13 @@
           </button>
         </div>
         <div class="listEntity">
-          <b-form-textarea @keypress.enter.prevent="addPhoneNumber" v-model="phoneNumberText"/>
+          <input
+            type="text"
+            class='form-control'
+            placeholder="+98xxxxxxxxxx"
+            @keypress.enter.prevent="addPhoneNumber"
+            v-model="phoneNumberText"
+          />
           <button
             class="btn btn-success listbtn"
             @click.prevent="addPhoneNumber"
@@ -155,7 +161,7 @@
       <input
         @click.prevent='register'
         type='submit'
-        class='c_submit btn btn-success form-control'
+        class='btn btn-success form-control'
         value='Register'
       >
     </form>
