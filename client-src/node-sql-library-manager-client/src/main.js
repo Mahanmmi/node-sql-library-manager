@@ -16,6 +16,9 @@ import store from './store';
 
 Vue.prototype.$http = axios.create({
   baseURL: process.env.VUE_APP_SERVER_BASE_URL,
+  headers: {
+    Authorization: store.getters.getToken,
+  },
 });
 
 Vue.use(BootstrapVue);

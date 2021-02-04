@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <notifications group="main" />
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div v-if="$store.getters.getToken" id="nav">
+      <router-link to="/panel">Panel</router-link>
     </div>
     <router-view/>
   </div>

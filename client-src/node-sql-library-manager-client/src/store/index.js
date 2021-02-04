@@ -20,18 +20,20 @@ export default new Vuex.Store({
     loginSetToken(state, token) {
       state.token = `Bearer ${token}`;
       localStorage.setItem('token', `Bearer ${token}`);
+      Vue.prototype.$http.defaults.headers.Authorization = `Bearer ${token}`;
     },
     logoutResetToken(state) {
       state.token = undefined;
-      localStorage.setItem('token', undefined);
+      localStorage.removeItem('token');
+      Vue.prototype.$http.defaults.headers.Authorization = undefined;
     },
   },
   actions: {
     async login({ commit }, user) {
-      const token = await Vue.prototype.$http.post('/users/login', {
+      const token = (await Vue.prototype.$http.post('/users/login', {
         username: user.username,
         password: user.password,
-      });
+      })).data;
       commit('loginSetToken', token);
     },
     async logout({ commit, state }) {

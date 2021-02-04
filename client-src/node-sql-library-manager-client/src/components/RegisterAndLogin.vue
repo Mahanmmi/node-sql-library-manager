@@ -55,7 +55,7 @@
           </button>
         </div>
         <div class="listEntity">
-          <b-form-textarea v-model="addressText"/>
+          <b-form-textarea @keypress.enter.prevent="addAddress" v-model="addressText"/>
           <button
             class="btn btn-success listbtn"
             @click.prevent="addAddress"
@@ -80,7 +80,7 @@
           </button>
         </div>
         <div class="listEntity">
-          <b-form-textarea v-model="phoneNumberText"/>
+          <b-form-textarea @keypress.enter.prevent="addPhoneNumber" v-model="phoneNumberText"/>
           <button
             class="btn btn-success listbtn"
             @click.prevent="addPhoneNumber"
@@ -159,7 +159,11 @@
         value='Register'
       >
     </form>
-    <form v-else class="d-flex flex-column align-content-around">
+    <form
+      v-else
+      class="d-flex flex-column align-content-around"
+      style="width: 100%"
+    >
       <label class="align-self">Username
         <input
           type='text'
@@ -205,7 +209,7 @@ export default {
   name: 'RegisterAndLogin',
   data() {
     return {
-      isReg: true,
+      isReg: false,
       user: {
         username: '',
         password: '',
@@ -215,11 +219,11 @@ export default {
         phoneNumbers: [],
         addresses: [],
         userType: '',
-        normalUserJob: 'DBA',
-        studentNumber: '0031000',
-        studentUniversity: 'AUT',
-        professorId: 'PR1732-2009',
-        professorUniversity: 'UBC',
+        normalUserJob: '',
+        studentNumber: '',
+        studentUniversity: '',
+        professorId: '',
+        professorUniversity: '',
       },
       addressText: '',
       phoneNumberText: '',
@@ -228,27 +232,41 @@ export default {
   methods: {
     async login() {
       try {
-        console.log('here');
         await this.$store.dispatch('login', this.user);
-      } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'Login error',
-          text: err.response.data,
-          type: 'error',
+          title: 'Login successful',
+          type: 'success',
         });
+        this.$router.push('panel');
+      } catch (err) {
+        if (err.response) {
+          this.$notify({
+            group: 'main',
+            title: 'Login error',
+            text: err.response.data,
+            type: 'error',
+          });
+        }
       }
     },
     async register() {
       try {
         await this.$http.post('/users', this.user);
-      } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'Register error',
-          text: err.response.data,
-          type: 'error',
+          title: 'Register successful',
+          type: 'success',
         });
+      } catch (err) {
+        if (err.response) {
+          this.$notify({
+            group: 'main',
+            title: 'Register error',
+            text: err.response.data,
+            type: 'error',
+          });
+        }
       }
     },
     removeAddress(index) {
@@ -257,6 +275,7 @@ export default {
     addAddress() {
       if (this.addressText) {
         this.user.addresses.push(this.addressText);
+        this.addressText = '';
       }
     },
     removePhoneNumber(index) {
@@ -265,6 +284,7 @@ export default {
     addPhoneNumber() {
       if (this.phoneNumberText) {
         this.user.phoneNumbers.push(this.phoneNumberText);
+        this.phoneNumberText = '';
       }
     },
   },
@@ -279,11 +299,15 @@ export default {
     justify-content: space-around;
     border-radius: 10px;
     box-shadow: 2px 4px 11px 5px rgba(0,0,0,0.54);
-    margin: auto;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin: 0 auto;
     min-width: 350px;
     max-width: 350px;
     min-height: 300px;
-    padding: 10px;
+    padding: 20px;
   }
 
   .listEntity {
