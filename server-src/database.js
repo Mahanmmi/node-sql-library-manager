@@ -26,7 +26,7 @@ async function getPool() {
     } catch (e) {
       await mainPool.end();
       mainPool = undefined;
-      console.error(e.message);
+      // console.error(e.message);
     }
   }
   return mainPool;

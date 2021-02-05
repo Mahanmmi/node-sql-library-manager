@@ -6,8 +6,9 @@ services:
       - postgres
     ports:
       - "3000:3000"
-    environment: 
+    environment:
       - POSTGRES_HOST=postgres
+      - VUE_APP_SERVER_BASE_URL=app:3000/api
     env_file:
       - "./.env"
 
