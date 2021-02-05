@@ -1,6 +1,6 @@
 <template>
   <div class="mePanelContainer">
-    <div class="d-flex flex-row justify-content-start">
+    <div v-if="user" class="d-flex flex-row justify-content-start">
       <div class="userMe">
         <p><span class="tag">Username:</span> {{user.username}}</p>
         <p><span class="tag">First Name:</span> {{user.first_name}}</p>
@@ -29,7 +29,7 @@
           <p><span class="tag">Phone numbers:</span></p>
           <p
             v-for="pnObj in user.phoneNumbers"
-            :key="pnObj"
+            :key="pnObj.phone_number"
           >
             {{pnObj.phone_number}}
           </p>
@@ -38,7 +38,7 @@
           <p><span class="tag">Addresses:</span></p>
           <p
             v-for="addObj in user.addresses"
-            :key="addObj"
+            :key="addObj.address"
           >
             {{addObj.address}}
           </p>

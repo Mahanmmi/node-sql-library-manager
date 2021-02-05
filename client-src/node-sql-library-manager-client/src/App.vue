@@ -4,7 +4,8 @@
     <div v-if="$store.getters.getToken" id="nav">
       <router-link to="/panel">Panel</router-link> |
       <router-link to="/book">Book</router-link> |
-      <router-link to="/borrow">‌Borrow</router-link>
+      <router-link to="/borrow">‌Borrow</router-link> |
+      <router-link to="/manage">Manage</router-link>
     </div>
     <router-view/>
   </div>

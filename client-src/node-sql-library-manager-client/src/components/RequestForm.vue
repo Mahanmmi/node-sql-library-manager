@@ -23,7 +23,7 @@
         class="d-flex align-items-center"
       >{{param}}
         <input
-          :type="text"
+          type="text"
           class="form-control"
           style="margin-left: 10px"
           v-model="reqParamData[param]"
