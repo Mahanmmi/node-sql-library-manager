@@ -36,12 +36,20 @@
         value='Send!'
       >
     </form>
+    <response-table
+      v-if="resData"
+      :resData="resData"
+      :resNames="resNames"
+    />
   </div>
 </template>
 
 <script>
+import ResponseTable from './ResponseTable.vue';
+
 export default {
   name: 'RequestForm',
+  components: { ResponseTable },
   data() {
     return {
       reqData: {},
@@ -61,21 +69,22 @@ export default {
     async sendRequest() {
       try {
         const thisPage = this;
-        console.log(thisPage.reqURL);
         this.resData = (await this.$http({
           method: thisPage.reqMethod,
           url: thisPage.reqURL,
           data: thisPage.reqData,
           params: thisPage.reqParamData,
-        }));
+        })).data;
       } catch (err) {
-        if (err.response) {
+        if (!err.response) {
           this.$notify({
             group: 'main',
             title: 'Request error',
-            text: err.response.data,
+            text: err.message,
             type: 'error',
           });
+        } else {
+          this.resData = err.response.data;
         }
       }
     },

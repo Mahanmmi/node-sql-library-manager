@@ -1,9 +1,9 @@
 <template>
   <div>
     <request-form
-      :reqName="'Add Balance'"
-      :reqMethod="'post'"
-      :reqURL="'/users/balance'"
+      reqName="Add Balance"
+      reqMethod="post"
+      reqURL="/users/balance"
       :reqBodyTypeNames="[
         {
           name: 'balance',
