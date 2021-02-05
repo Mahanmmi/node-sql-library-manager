@@ -94,9 +94,9 @@ export default {
     border-radius: 10px;
     padding: 20px;
     margin: 10px 0;
-    min-width: 70%;
-    width: 70%;
-    max-width: 70%;
+    min-width: 75%;
+    width: 75%;
+    max-width: 75%;
   }
 
   .userMe {

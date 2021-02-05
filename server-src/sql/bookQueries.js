@@ -150,6 +150,38 @@ END;
 $add_book_function$ LANGUAGE plpgsql;
 `.trim();
 
+const registerSearchBookFunction = `
+CREATE OR REPLACE FUNCTION search_book_function(
+  sbook_title text,
+  swriter_name text,
+  sbook_volume text,
+  sbook_genre text
+) RETURNS TABLE (
+    bookId text,
+    bookVolume text,
+    book_type book_types,
+    bookTitle text,
+    bookGenre text,
+    book_page_count SMALLINT,
+    book_price INTEGER,
+    publisher_name text,
+    writerName text
+) AS $search_book_function$
+BEGIN
+RETURN QUERY (
+    SELECT *
+    FROM Books NATURAL JOIN BookWriters
+    WHERE (
+      book_title LIKE sbook_title AND
+      writer_name LIKE swriter_name AND
+      book_volume LIKE sbook_volume AND
+      book_genre LIKE sbook_genre
+    ) ORDER BY book_title
+  );
+END;
+$search_book_function$ LANGUAGE plpgsql;
+`.trim();
+
 const createBook = `
 SELECT create_book_function(
   $1, $2, $3, $4, $5,
@@ -176,14 +208,9 @@ SELECT add_book_function(
 `.trim();
 
 const searchBook = `
-SELECT *
-FROM Books NATURAL JOIN BookWriters
-WHERE (
-  book_title LIKE $1 AND
-  writer_name LIKE $2 AND
-  book_volume LIKE $3 AND
-  book_genre LIKE $4
-) ORDER BY book_title;
+SELECT search_book_function(
+  $1, $2, $3, $4
+)
 `.trim();
 
 async function registerBookFunctions(client) {
@@ -191,6 +218,7 @@ async function registerBookFunctions(client) {
   await client.query(registerCreatePublisherFunction);
   await client.query(registerAddBookWriterFunction);
   await client.query(registerAddBookFunction);
+  await client.query(registerSearchBookFunction);
 }
 
 module.exports = {

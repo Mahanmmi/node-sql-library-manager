@@ -1,15 +1,28 @@
 <template>
   <div class="d-flex flex-column align-items-center justify-content-around">
     <me-panel :user="user"/>
+    <request-form
+      reqName="Add Balance"
+      reqMethod="post"
+      reqURL="/users/balance"
+      :reqBodyTypeNames="[
+        {
+          name: 'balance',
+          type: 'number',
+        }
+      ]"
+    />
   </div>
 </template>
 
 <script>
 import MePanel from '@/components/MePanel.vue';
+import RequestForm from '@/components/RequestForm.vue';
 
 export default {
   name: 'Panel',
   components: {
+    RequestForm,
     MePanel,
   },
   data() {

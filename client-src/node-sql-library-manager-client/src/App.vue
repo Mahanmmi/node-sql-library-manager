@@ -3,7 +3,7 @@
     <notifications group="main" />
     <div v-if="$store.getters.getToken" id="nav">
       <router-link to="/panel">Panel</router-link> |
-      <router-link to="/user">User</router-link>
+      <router-link to="/book">Book</router-link>
     </div>
     <router-view/>
   </div>
